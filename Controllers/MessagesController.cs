@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Security.Claims;
 using System.Threading.Tasks;
 using AutoMapper;
@@ -41,26 +42,23 @@ namespace DatingApp.API.Controllers
         }
 
         [HttpGet]
-        public async Task<IActionResult> GetMessageForUser(int userId, MessageParams messageParams)
+        public async Task<IActionResult> GetMessagesForUser(int userId, [FromQuery]MessageParams messageParams)
         {
-            if (userId != int.Parse(User.FindFirst(ClaimTypes.NameIdentifier).Value))
-                return Unauthorized();
+             if (userId != int.Parse(User.FindFirst(ClaimTypes.NameIdentifier).Value))
+                 return Unauthorized();
 
-            messageParams.UserId = userId;
+              messageParams.UserId = userId;
 
-            var messageFromRepository = await _repository.GetMessagesForUser(messageParams);
+              var messagesFromRepo = await _repository.GetMessagesForUser(messageParams);
 
-            var messages = _mapper.Map<IEquatable<MessageToReturnDto>>(messageFromRepository);
+              var messages = _mapper.Map<IEnumerable<MessageToReturnDto>>(messagesFromRepo);
 
-            Response.AddPagination(
-                messageFromRepository.CurrentPage,
-                messageFromRepository.PageSize,
-                messageFromRepository.TotalCount,
-                messageFromRepository.TotalPages
-            );
+              Response.AddPagination(messagesFromRepo.CurrentPage, messagesFromRepo.PageSize, 
+                 messagesFromRepo.TotalCount, messagesFromRepo.TotalPages);
 
-            return Ok(messages);
+              return Ok(messages);
         }
+
         [HttpGet("thread/{recipientId}")]
         public async Task<IActionResult> GetMessageThread(int userId, int recipientId)
         {
