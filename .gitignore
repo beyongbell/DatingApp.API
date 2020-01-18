@@ -2,5 +2,7 @@
 bin
 obj
 *.db
+*.db-shm
+*.db-wal
 SQL
 appsettings.json
