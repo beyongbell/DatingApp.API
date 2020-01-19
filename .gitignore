@@ -6,3 +6,4 @@ obj
 *.db-wal
 SQL
 appsettings.json
+wwwroot
